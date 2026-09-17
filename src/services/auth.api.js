@@ -1,3 +1,4 @@
+import { request } from "./apiClient";
 import { mockDelay } from "./mockDelay";
 
 const ADMIN_USERS = [
@@ -11,71 +12,20 @@ function isAdminEmail(email) {
   return ADMIN_USERS.includes(String(email || "").toLowerCase());
 }
 
-function normalizeContact(contact) {
-  const value = String(contact || "").trim();
-  if (!value) return null;
-  return value;
-}
-
-function buildUserFromContact(contact, name = "") {
-  const normalized = normalizeContact(contact);
-  if (!normalized) return null;
-  const isEmail = normalized.includes("@");
-  const email = isEmail
-    ? normalized.toLowerCase()
-    : `${normalized}@farmish.demo`;
-  const phone = isEmail ? "" : normalized;
-  const role = isEmail && isAdminEmail(normalized) ? "admin" : "customer";
-  const userName =
-    role === "admin"
-      ? "Farmish Admin"
-      : name || (isEmail ? normalized.split("@")[0] : normalized);
-  return { name: userName, email, phone, role };
-}
-
 /** Mirrors POST /auth/login */
 export async function apiLogin({ contact, password }) {
-  await mockDelay(450);
-  const normalized = normalizeContact(contact);
-  if (!normalized || !password) {
-    return { ok: false, error: "Missing credentials" };
-  }
-  const user = buildUserFromContact(normalized);
-  if (!user) {
-    return { ok: false, error: "Invalid login contact" };
-  }
-  return {
-    ok: true,
-    data: {
-      token: `mock_${Date.now()}`,
-      user: {
-        ...user,
-        savedAddresses: user.savedAddresses || [],
-      },
-    },
-  };
+  return request("/auth/login", {
+    method: "POST",
+    body: JSON.stringify({ contact, password }),
+  });
 }
 
 /** Mirrors POST /auth/register */
 export async function apiRegister({ name, email, password, phone }) {
-  await mockDelay(500);
-  const normalizedEmail = normalizeContact(email);
-  const normalizedPhone = normalizeContact(phone);
-  if (!name || !password || (!normalizedEmail && !normalizedPhone)) {
-    return { ok: false, error: "Fill all required fields" };
-  }
-  const contact = normalizedEmail || normalizedPhone;
-  const user = buildUserFromContact(contact, name);
-  return {
-    ok: true,
-    data: {
-      token: `mock_${Date.now()}`,
-      user: {
-        ...user,
-        savedAddresses: [],
-      },
-    },
-  };
+  return request("/auth/register", {
+    method: "POST",
+    body: JSON.stringify({ name, email, password, phone }),
+  });
 }
 
 /** Mirrors POST /auth/otp — prototype stub */

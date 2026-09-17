@@ -1,19 +1,15 @@
-import { mockDelay } from "./mockDelay";
+import { authHeaders, request } from "./apiClient";
 
 /** Mirrors POST /orders — client builds payload; server would persist */
 export async function apiCreateOrder(payload) {
-  await mockDelay(600);
-  return {
-    ok: true,
-    data: {
-      orderId: payload.orderId,
-      status: "confirmed",
-    },
-  };
+  return request("/orders", {
+    method: "POST",
+    headers: authHeaders(),
+    body: JSON.stringify(payload),
+  });
 }
 
 /** Mirrors GET /orders/:id */
 export async function apiGetOrder(orderId) {
-  await mockDelay(250);
-  return { ok: true, data: { orderId, status: "out_for_delivery" } };
+  return request(`/orders/${orderId}`, { headers: authHeaders() });
 }

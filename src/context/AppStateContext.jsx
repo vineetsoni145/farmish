@@ -16,6 +16,7 @@ import {
 const LS_CART = "farmish_cart";
 const LS_CART_COUPON = "farmish_cart_coupon";
 const LS_USER = "farmish_user";
+const LS_TOKEN = "farmish_token";
 const LS_ORDERS = "farmish_orders";
 const LS_WISHLIST = "farmish_wishlist";
 const LS_REVIEWS = "farmish_reviews";
@@ -136,6 +137,7 @@ export function AppStateProvider({ children }) {
   const login = useCallback(async (contact, password) => {
     const res = await apiLogin({ contact, password });
     if (!res.ok) return { ok: false, error: res.error || "Login failed" };
+    localStorage.setItem(LS_TOKEN, res.data.token);
     setUser(res.data.user);
     return { ok: true };
   }, []);
@@ -233,6 +235,7 @@ export function AppStateProvider({ children }) {
     const res = await apiRegister(payload);
     if (!res.ok)
       return { ok: false, error: res.error || "Registration failed" };
+    localStorage.setItem(LS_TOKEN, res.data.token);
     setUser(res.data.user);
     return { ok: true };
   }, []);
@@ -250,7 +253,10 @@ export function AppStateProvider({ children }) {
     return { ok: true, data: res.data };
   }, []);
 
-  const logout = useCallback(() => setUser(null), []);
+  const logout = useCallback(() => {
+    localStorage.removeItem(LS_TOKEN);
+    setUser(null);
+  }, []);
   const markAdminVerified = useCallback(() => {
     setUser((prev) => (prev ? { ...prev, adminVerified: true } : prev));
   }, []);
