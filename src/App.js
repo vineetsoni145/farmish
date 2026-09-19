@@ -53,6 +53,7 @@ function App() {
             <Route path="product/:productId" element={<ProductDetails />} />
             <Route path="wishlist" element={<Wishlist />} />
             <Route path="cart" element={<Cart />} />
+            // Protected routes require user authentication.
             <Route
               path="checkout"
               element={
@@ -93,7 +94,6 @@ function App() {
             <Route path="privacy" element={<PrivacyPage />} />
             <Route path="terms" element={<TermsPage />} />
             <Route path="cookies" element={<CookiesPage />} />
-
             <Route
               path="orders"
               element={
@@ -106,12 +106,11 @@ function App() {
               <Route path=":orderId" element={<OrderTracking />} />
             </Route>
           </Route>
-
           <Route element={<AuthLayout />}>
             <Route path="login" element={<Login />} />
             <Route path="register" element={<Register />} />
           </Route>
-
+          // Admin dashboard routes.
           <Route
             path="admin"
             element={
