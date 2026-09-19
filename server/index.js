@@ -18,8 +18,13 @@ app.get("/api/health", (_req, res) => {
   res.json({ ok: true, service: "farmish-api" });
 });
 
+// Authentication routes
 app.use("/api/auth", authRoutes);
+
+// Product management routes
 app.use("/api/products", productRoutes);
+
+// Order management routes
 app.use("/api/orders", orderRoutes);
 
 app.use((err, _req, res, _next) => {
